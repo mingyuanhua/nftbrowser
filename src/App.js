@@ -1,7 +1,8 @@
-import { Button, Card, Input, Layout, List, message } from "antd";
+import { Button, Input, Layout, List, message } from "antd";
 import { useState } from "react";
 import { searchNFTs } from "./utils";
 import "./App.css";
+import NftCard from "./components/NftCard";
 
 // 函数的调用不要写到jsx区域
 // 一般调用数据的应用可以写在哪里？
@@ -12,6 +13,25 @@ import "./App.css";
 const { Header, Content } = Layout;
 
 function App() {
+  // 三个state 分别对应页面上的什么？
+  // state的特点是它的变化能够引发它所在的Component rerender --> 小刷新机制
+  // nfts存的是搜索返回的nft data
+
+  // loading是控制页面上是否转圈圈显示 我们是选择是哪里转圈圈？除了list外，是在点击按钮的时候
+
+  // Button props添加loading={loading} 可以转圈圈 好处是防止当前短时间内重复/没有意义的大量请求
+
+  // list最关键的是哪几个props？dataSource和renderItem
+
+  // Input.Group 这个Component的作用是什么？作用就是把里面的东西group在一起，这里是Input和Button放在一起对齐
+
+  // 调API这里，aysnc语法必须和await同时出现才有意义
+
+  // 每次调API是什么套路呢？首先 把loading状态变成true 然后写真正调API的代码 最后别忘了把loading状态变回false
+
+  // 下一步是什么？就是把卡片改成有意义的卡片，而不是123，是真正的dataSource和Card
+  // 之前Card里面写在这里可读性就差了，所以可以单独写一个Component，把List.Item直接都包出去
+
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -56,7 +76,7 @@ function App() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
-          <Button type="primary" onClick={handleSearch}>
+          <Button loading={loading} type="primary" onClick={handleSearch}>
             Search
           </Button>
         </Input.Group>
@@ -76,12 +96,8 @@ function App() {
             xl: 4,
             xxl: 4,
           }}
-          dataSource={[1, 2, 3]}
-          renderItem={(nft) => (
-            <List.Item key={nft}>
-              <Card title={nft} />
-            </List.Item>
-          )}
+          dataSource={nfts}
+          renderItem={(nft) => <NftCard nft={nft} />}
         />
       </Content>
     </Layout>
